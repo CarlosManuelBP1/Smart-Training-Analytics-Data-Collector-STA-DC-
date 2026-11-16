@@ -1,47 +1,80 @@
+
 package com.sta.datacollector
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.sta.datacollector.ui.theme.STADataCollectorTheme
+import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
-            STADataCollectorTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            MaterialTheme {
+                STAHomeScreen()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun STAHomeScreen() {
+    Scaffold(
+        topBar = {
+            Surface(
+                tonalElevation = 3.dp
+            ) {
+                Text(
+                    text = "Smart Training Analytics",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "STA Data Collector",
+                style = MaterialTheme.typography.headlineMedium
+            )
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    STADataCollectorTheme {
-        Greeting("Android")
+            Text(
+                text = "Sistema de recopilación de datos de entrenamiento"
+            )
+
+            Button(
+                onClick = { },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Nueva sesión")
+            }
+
+            OutlinedButton(
+                onClick = { },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Participantes")
+            }
+
+            OutlinedButton(
+                onClick = { },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Historial de grabaciones")
+            }
+        }
     }
 }
