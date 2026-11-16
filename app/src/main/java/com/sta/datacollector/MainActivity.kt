@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sta.datacollector.sensor.AndroidSensorDataSource
 import com.sta.datacollector.ui.participants.ParticipantScreen
 import com.sta.datacollector.ui.participants.ParticipantViewModel
 import com.sta.datacollector.ui.participants.ParticipantViewModelFactory
@@ -31,6 +32,9 @@ import com.sta.datacollector.ui.sessions.SessionHistoryScreen
 import com.sta.datacollector.ui.sessions.SessionViewModel
 import com.sta.datacollector.ui.sessions.SessionViewModelFactory
 import com.sta.datacollector.ui.sessions.TrainingSessionScreen
+import com.sta.datacollector.ui.sensors.SensorDiagnosticScreen
+import com.sta.datacollector.ui.sensors.SensorDiagnosticViewModel
+import com.sta.datacollector.ui.sensors.SensorDiagnosticViewModelFactory
 import com.sta.datacollector.ui.theme.STADataCollectorTheme
 
 class MainActivity : ComponentActivity() {
@@ -45,6 +49,7 @@ class MainActivity : ComponentActivity() {
                         onNewSessionClick = { destination = AppDestination.SESSION },
                         onParticipantsClick = { destination = AppDestination.PARTICIPANTS },
                         onHistoryClick = { destination = AppDestination.HISTORY },
+                        onSensorDiagnosticClick = { destination = AppDestination.SENSORS },
                     )
 
                     AppDestination.PARTICIPANTS -> {
@@ -83,6 +88,19 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
+
+                    AppDestination.SENSORS -> {
+                        val factory = remember(applicationContext) {
+                            SensorDiagnosticViewModelFactory(
+                                AndroidSensorDataSource(applicationContext)
+                            )
+                        }
+                        val sensorViewModel: SensorDiagnosticViewModel = viewModel(factory = factory)
+                        SensorDiagnosticScreen(
+                            viewModel = sensorViewModel,
+                            onBack = { destination = AppDestination.HOME },
+                        )
+                    }
                 }
             }
         }
@@ -94,6 +112,7 @@ private enum class AppDestination {
     PARTICIPANTS,
     SESSION,
     HISTORY,
+    SENSORS,
 }
 
 @Composable
@@ -101,6 +120,7 @@ fun STAHomeScreen(
     onNewSessionClick: () -> Unit,
     onParticipantsClick: () -> Unit,
     onHistoryClick: () -> Unit,
+    onSensorDiagnosticClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -149,6 +169,13 @@ fun STAHomeScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Historial de grabaciones")
+            }
+
+            OutlinedButton(
+                onClick = onSensorDiagnosticClick,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Diagnóstico de sensores")
             }
         }
     }
