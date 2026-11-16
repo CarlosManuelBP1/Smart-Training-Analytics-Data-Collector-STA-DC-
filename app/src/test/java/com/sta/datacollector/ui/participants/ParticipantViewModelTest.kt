@@ -145,6 +145,8 @@ private class FakeParticipantDao : ParticipantDao {
     override fun observeActiveParticipants(): Flow<List<ParticipantEntity>> =
         participants.map { all -> all.filter(ParticipantEntity::isActive) }
 
+    override fun observeAllParticipants(): Flow<List<ParticipantEntity>> = participants
+
     override suspend fun archive(id: String, updatedAt: Long): Int {
         val participant = getById(id)?.takeIf(ParticipantEntity::isActive) ?: return 0
         return update(participant.copy(isActive = false, updatedAt = updatedAt))

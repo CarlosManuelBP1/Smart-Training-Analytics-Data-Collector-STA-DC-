@@ -12,6 +12,12 @@ class TrainingSessionRepository(
     fun observeSessions(): Flow<List<TrainingSessionEntity>> =
         trainingSessionDao.observeSessions()
 
+    fun observeActiveSession(): Flow<TrainingSessionEntity?> =
+        trainingSessionDao.observeActiveSession()
+
+    fun observeParticipants(sessionId: String): Flow<List<ParticipantEntity>> =
+        trainingSessionDao.observeParticipantsForSession(sessionId)
+
     suspend fun getSessionById(sessionId: String): TrainingSessionEntity? =
         trainingSessionDao.getSessionById(sessionId)
 
@@ -37,12 +43,42 @@ class TrainingSessionRepository(
         )
     }
 
+    suspend fun createSharedSessionIfNoneActive(
+        session: TrainingSessionEntity,
+        participantIds: Collection<String>,
+    ): Boolean {
+        val uniqueParticipantIds = participantIds.distinct()
+        require(uniqueParticipantIds.isNotEmpty()) {
+            "Una sesión debe tener al menos un participante."
+        }
+        return trainingSessionDao.insertSessionWithParticipantsIfNoneActive(
+            session = session,
+            participants = uniqueParticipantIds.map { participantId ->
+                SessionParticipantEntity(session.id, participantId)
+            },
+        )
+    }
+
     suspend fun addParticipant(sessionId: String, participantId: String) {
         trainingSessionDao.addParticipant(
             SessionParticipantEntity(
                 sessionId = sessionId,
                 participantId = participantId,
             )
+        )
+    }
+
+    suspend fun addParticipants(
+        sessionId: String,
+        participantIds: Collection<String>,
+    ): Boolean {
+        val uniqueParticipantIds = participantIds.distinct()
+        if (uniqueParticipantIds.isEmpty()) return false
+        return trainingSessionDao.addParticipantsToActiveSession(
+            sessionId = sessionId,
+            participants = uniqueParticipantIds.map { participantId ->
+                SessionParticipantEntity(sessionId, participantId)
+            },
         )
     }
 

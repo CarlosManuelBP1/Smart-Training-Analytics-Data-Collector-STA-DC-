@@ -27,6 +27,9 @@ interface ParticipantDao {
     )
     fun observeActiveParticipants(): Flow<List<ParticipantEntity>>
 
+    @Query("SELECT * FROM participants ORDER BY nickname COLLATE NOCASE ASC")
+    fun observeAllParticipants(): Flow<List<ParticipantEntity>>
+
     @Query(
         """
         UPDATE participants

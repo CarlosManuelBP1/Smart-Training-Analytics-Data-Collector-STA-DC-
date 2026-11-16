@@ -10,6 +10,9 @@ class ParticipantRepository(
     fun observeActiveParticipants(): Flow<List<ParticipantEntity>> =
         participantDao.observeActiveParticipants()
 
+    fun observeAllParticipants(): Flow<List<ParticipantEntity>> =
+        participantDao.observeAllParticipants()
+
     suspend fun getById(id: String): ParticipantEntity? = participantDao.getById(id)
 
     suspend fun insert(participant: ParticipantEntity) {

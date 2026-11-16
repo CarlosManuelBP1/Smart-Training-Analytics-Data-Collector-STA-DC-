@@ -27,6 +27,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sta.datacollector.ui.participants.ParticipantScreen
 import com.sta.datacollector.ui.participants.ParticipantViewModel
 import com.sta.datacollector.ui.participants.ParticipantViewModelFactory
+import com.sta.datacollector.ui.sessions.SessionHistoryScreen
+import com.sta.datacollector.ui.sessions.SessionViewModel
+import com.sta.datacollector.ui.sessions.SessionViewModelFactory
+import com.sta.datacollector.ui.sessions.TrainingSessionScreen
 import com.sta.datacollector.ui.theme.STADataCollectorTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,7 +42,9 @@ class MainActivity : ComponentActivity() {
                 var destination by rememberSaveable { mutableStateOf(AppDestination.HOME) }
                 when (destination) {
                     AppDestination.HOME -> STAHomeScreen(
-                        onParticipantsClick = { destination = AppDestination.PARTICIPANTS }
+                        onNewSessionClick = { destination = AppDestination.SESSION },
+                        onParticipantsClick = { destination = AppDestination.PARTICIPANTS },
+                        onHistoryClick = { destination = AppDestination.HISTORY },
                     )
 
                     AppDestination.PARTICIPANTS -> {
@@ -52,6 +58,31 @@ class MainActivity : ComponentActivity() {
                             onBack = { destination = AppDestination.HOME },
                         )
                     }
+
+                    AppDestination.SESSION,
+                    AppDestination.HISTORY,
+                    -> {
+                        val staApplication = application as STAApplication
+                        val factory = remember(staApplication) {
+                            SessionViewModelFactory(
+                                staApplication.participantRepository,
+                                staApplication.trainingSessionRepository,
+                                staApplication.exerciseSetRepository,
+                            )
+                        }
+                        val sessionViewModel: SessionViewModel = viewModel(factory = factory)
+                        if (destination == AppDestination.SESSION) {
+                            TrainingSessionScreen(
+                                viewModel = sessionViewModel,
+                                onBack = { destination = AppDestination.HOME },
+                            )
+                        } else {
+                            SessionHistoryScreen(
+                                viewModel = sessionViewModel,
+                                onBack = { destination = AppDestination.HOME },
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -61,11 +92,15 @@ class MainActivity : ComponentActivity() {
 private enum class AppDestination {
     HOME,
     PARTICIPANTS,
+    SESSION,
+    HISTORY,
 }
 
 @Composable
 fun STAHomeScreen(
+    onNewSessionClick: () -> Unit,
     onParticipantsClick: () -> Unit,
+    onHistoryClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -96,7 +131,7 @@ fun STAHomeScreen(
             Text("Sistema de recopilación de datos de entrenamiento")
 
             Button(
-                onClick = { },
+                onClick = onNewSessionClick,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Nueva sesión")
@@ -110,7 +145,7 @@ fun STAHomeScreen(
             }
 
             OutlinedButton(
-                onClick = { },
+                onClick = onHistoryClick,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Historial de grabaciones")
